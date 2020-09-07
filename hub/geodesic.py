@@ -1,4 +1,4 @@
-from typing import Type, Optional
+from typing import Optional
 
 import numpy as np
 
