@@ -1,3 +1,3 @@
 ## Finding optimal aero hub
-![badge](https://action-badges.now.sh/otzhora/optimal_aero_hub)
+![Tests and Style](https://github.com/otzhora/optimal_aero_hub/workflows/Tests%20and%20Style/badge.svg)
 README will be here soon...
