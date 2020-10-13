@@ -1,6 +1,7 @@
 from typing import Optional
 
 import numpy as np
+import torch
 
 EARTH_RADIUS = 6371.009
 
@@ -46,5 +47,38 @@ def distance(a: Point, b: Point) -> float:
                            (cos_lat1 * sin_lat2 -
                             sin_lat1 * cos_lat2 * cos_delta_lng) ** 2),
                    sin_lat1 * sin_lat2 + cos_lat1 * cos_lat2 * cos_delta_lng)
+
+    return EARTH_RADIUS * d
+
+
+def distance_tensors(points_1: torch.tensor, points_2: torch.tensor):
+    """
+    Given geodesic coordinates of two tensors of point return the pairwise distance between them.
+    I assume Earth to be a sphere.
+
+    Example:
+    >>>> moscow = torch.tensor([55.751244, 37.618423])
+    >>>> spb = torch.tensor([59.9342802, 30.3350986])
+    >>>> distance_tensors(moscow, spb)
+    tensor([633.4543])
+
+    :param points_1: coordinates of points
+    :param points_2: coordinates of points
+    :return: pairwise disctances between points_1 and points_2 in kilometers
+    """
+
+    points_1 = torch.deg2rad(points_1)
+    points_2 = torch.deg2rad(points_2)
+
+    sin_lat1, cos_lat1 = torch.sin(points_1[:, 0]), torch.cos(points_1[:, 0])
+    sin_lat2, cos_lat2 = torch.sin(points_2[:, 0]), torch.cos(points_2[:, 0])
+
+    delta_lng = points_2[:, 1] - points_1[:, 1]
+    cos_delta_lng, sin_delta_lng = torch.cos(delta_lng), torch.sin(delta_lng)
+
+    d = torch.atan2(torch.sqrt(torch.pow((cos_lat2 * sin_delta_lng), 2) +
+                               torch.pow((cos_lat1 * sin_lat2 -
+                                          sin_lat1 * cos_lat2 * cos_delta_lng), 2)),
+                    sin_lat1 * sin_lat2 + cos_lat1 * cos_lat2 * cos_delta_lng)
 
     return EARTH_RADIUS * d
