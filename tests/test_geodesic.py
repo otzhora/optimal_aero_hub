@@ -1,34 +1,26 @@
 import numpy as np
-import pytest
+import pandas as pd
 import torch
 from numpy.testing import assert_allclose
 
-from hub.geodesic import Point, distance, distance_tensors
+from hub.geodesic import Points
 
 
-def test_distance():
-    moscow = Point(55.751244, 37.618423)
-    spb = Point(59.9342802, 30.3350986)
-
-    assert 633.4538325946983 == pytest.approx(distance(moscow, spb))
-
-    newport = Point(41.49008, -71.312796)
-    cleveland = Point(41.499498, -81.695391)
-
-    assert 864.2144943393627 == pytest.approx(distance(newport, cleveland))
-
-
-def test_distance_tensors():
-    moscow = torch.tensor([[55.751244, 37.618423]])
+def test_points():
+    moscow = pd.DataFrame([{"lat": 55.751244, "lng": 37.618423, "passengers": 1}])
     spb = torch.tensor([[59.9342802, 30.3350986]])
 
-    d = distance_tensors(moscow, spb).numpy()
+    Points_msk = Points(moscow)
+
+    d = Points_msk.distances_to_point(spb).numpy()
 
     assert_allclose(np.array([633.4538325946983]), d, rtol=1e-03)
 
-    newport = torch.tensor([[41.49008, -71.312796]])
-    cleveland = torch.tensor([[41.499498, -81.695391]])
+    df = pd.DataFrame([{"lat": 41.49008, "lng": -71.312796, "passengers": 1},
+                       {"lat": 41.499498, "lng": -81.695391, "passengers": 1},
+                       {"lat": 55.751244, "lng": 37.618423, "passengers": 1}])
+    Points_df = Points(df)
 
-    d = distance_tensors(newport, cleveland).numpy()
+    d = Points_df.distances_to_point(spb).numpy()
 
-    assert_allclose(np.array([864.2144943393627]), d, rtol=1e-03)
+    assert_allclose(np.array([6689.4517, 7156.5312, 633.4543]), d, rtol=1e-03)
