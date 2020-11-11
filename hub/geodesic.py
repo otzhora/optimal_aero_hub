@@ -17,6 +17,7 @@ class Points:
         self.coordinates = torch.tensor([*zip(airports.loc[:, "lat"], airports.loc[:, 'lng'])],
                                         dtype=torch.float64)
         self.passengers = torch.tensor(airports.loc[:, "passengers"], dtype=torch.float64)
+        self.normalized_passengers = self.passengers / self.passengers.sum()
 
     def __str__(self):
         return self.airports.__str__()
